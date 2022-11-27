@@ -1,0 +1,124 @@
+.container {
+    --border-radius: 0.25em;
+    --outline: 0.05em solid #777;
+
+    position: relative;
+    width: 20em;
+    min-height: 1.5em;
+    border: none;
+    display: flex;
+    align-items: center;
+    padding: 0.5em 0;
+
+    outline: var(--outline);
+    border-radius: var(--border-radius);
+}
+
+.container:focus-visible {
+    border-color: lightskyblue;
+}
+
+.container > * {
+    padding: 0 0.5em;
+    align-self: stretch;
+}
+
+.chosen-label {
+    flex-grow: 1;
+    display: flex;
+    gap: 0.5em;
+    flex-wrap: wrap;
+}
+
+.chosen-label:empty::after{
+    color: var(--primary-color, #777);
+    content: "Choose an option...";
+}
+
+.close-btn, .clear-btn {
+    background: none;
+    color: var(--primary-color, #777);
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 1.25em;
+}
+
+.caret {
+    border: .25em solid transparent;
+    border-top-color: var(--primary-color, #777);
+    translate: 0 25%;
+}
+
+.close-btn:focus-visible, .close-btn:hover, .clear-btn:focus-visible, .clear-btn:hover {
+    color: var(--focus-color, #333);
+}
+
+.divider {
+    background-color: var(--primary-color, #777);
+    padding: 0;
+    align-self: stretch;
+    width: 0.05em;
+}
+
+.options {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: none;
+    max-height: 10em;
+    overflow-y: auto;
+    outline: inherit;
+    border-radius: inherit;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 0.25em);
+    background-color: var(--bg-color, white);
+    z-index: 1000;
+}
+
+.options.shown {
+    display: block;
+}
+
+.option {
+    cursor: pointer;
+    padding: 0.5em;
+}
+
+.option.selected {
+    background-color: rgba(135, 206, 250, 0.6);
+}
+
+.option.highlighted {
+    background-color: rgba(30, 144, 255, 0.6);
+    color: white;
+}
+
+.option-badge {
+    display: flex;
+    border-radius: var(--border-radius);
+    outline: var(--outline);
+    border: none;
+    background: none;
+    padding: 0 0.25em;
+    cursor: pointer;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.option-badge > .clear-btn {
+    margin-left: 0.125em;
+}
+
+.option-badge:hover, .option-badge:focus-visible {
+    background-color: var(--cancel-color-light, rgba(255, 0, 0, 0.1));
+    outline-color: var(--cancel-color-strog, rgba(255, 0, 0, 0.6));
+}
+
+.option-badge:hover > .clear-btn, .option-badge:focus-visible > .clear-btn {
+    color: var(--cancel-color-strog, rgba(255, 0, 0, 0.6));
+}
