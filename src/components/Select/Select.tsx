@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from 'react';
+import React, {FC, useEffect, useRef, useState} from 'react';
 import styles from "./select.module.css"
 
 export type SelectOption = {
@@ -27,9 +27,10 @@ const Select: FC<SelectProps> = ({ multiple, currentOption, onChange, options}) 
     const [isOpen, setIsOpen] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState(0);
 
+    const containerRef = useRef<HTMLDivElement>(null);
+
     const toggleOptions = (e: React.MouseEvent) => {
         e.stopPropagation();
-        console.log("toggle");
         setIsOpen(prev => !prev);
     }
     const hideOptions = () => setIsOpen(false);
@@ -38,7 +39,7 @@ const Select: FC<SelectProps> = ({ multiple, currentOption, onChange, options}) 
         multiple ? onChange([]) : onChange(undefined);
     }
 
-    const selectOption = (option: SelectOption) => (e: React.MouseEvent) => {
+    const selectOption = (option: SelectOption) => (e: React.MouseEvent | KeyboardEvent) => {
         e.preventDefault();
         e.stopPropagation();
         if (multiple) {
@@ -64,8 +65,45 @@ const Select: FC<SelectProps> = ({ multiple, currentOption, onChange, options}) 
             setHighlightedIndex(0);
     }, [isOpen])
 
+    useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if (e.target != containerRef.current) return;
+            switch (e.code) {
+                case "Enter":
+                case "Space":
+                    setIsOpen(prev => !prev);
+                    if (isOpen) {
+                        selectOption(options[highlightedIndex])(e);
+                    }
+                    break
+                case "ArrowUp":
+                case "ArrowDown": {
+                    if (!isOpen) {
+                        setIsOpen(true);
+                        break
+                    }
+
+                    const newIndex = highlightedIndex + (e.code === "ArrowDown" ? 1 : -1)
+                    if (newIndex >= 0 && newIndex < options.length) {
+                        setHighlightedIndex(newIndex);
+                    }
+                    break
+                }
+                case "Escape":
+                    setIsOpen(false);
+                    break
+            }
+        }
+        containerRef.current?.addEventListener("keydown", handler)
+
+        return () => {
+            containerRef.current?.removeEventListener("keydown", handler);
+        }
+    }, [isOpen, highlightedIndex, options]);
+
+
     return (
-        <div className={styles.container} onClick={toggleOptions} onBlur={(e) => {
+        <div ref={containerRef} className={styles.container} onClick={toggleOptions} onBlur={(e) => {
             if (!e.currentTarget.contains(e.relatedTarget)) {
                 hideOptions();
             }
@@ -75,9 +113,12 @@ const Select: FC<SelectProps> = ({ multiple, currentOption, onChange, options}) 
                     {o.label}<span className={styles["clear-btn"]} children="&times;" />
                 </button>
             )) : currentOption?.label} />
-            <button className={styles["clear-btn"]} onClick={clearOptions} children="&times;" />
+            <button className={styles["clear-btn"]} onClick={clearOptions} children="&times;" title={"Remove selected"} />
             <div className={styles.divider} />
-            <button className={styles["close-btn"]} onClick={toggleOptions} children={<div className={styles.caret}/>} />
+            <div className={styles["close-icon"]} onClick={(e) => {
+                toggleOptions(e);
+                containerRef.current?.focus();
+            }} children={<div className={`${styles.caret} ${isOpen ? "" : styles.highlighted}`}/>} />
             <ul className={`${styles.options} ${isOpen ? styles.shown : ""}`} children={options.map(
                 (option, index) => (<li
                     key={`li${option.value}`}
