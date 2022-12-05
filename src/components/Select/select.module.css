@@ -16,7 +16,7 @@
 }
 
 .container:focus-visible {
-    outline-color: var(--accent-color, lightskyblue);
+    outline-color: var(--accent-color);
 }
 
 .container > * {
@@ -24,9 +24,10 @@
     align-self: stretch;
 }
 
-:where(.container:focus-visible, .container:hover) > .close-icon > .caret.highlighted {
-    border-top-color: var(--accent-color, lightskyblue);
+:is(.toggle-icon:hover, .container:focus-visible) .caret {
+    border-top-color: var(--accent-color);
 }
+
 
 .chosen-label {
     flex-grow: 1;
@@ -36,15 +37,15 @@
 }
 
 .chosen-label:empty::after{
-    color: var(--primary-color, #777);
+    color: var(--primary-color);
     content: "Choose an option...";
 }
 
-.close-icon, .clear-btn {
+.toggle-icon, .clear-btn {
     display: flex;
     align-items: center;
     background: none;
-    color: var(--primary-color, #777);
+    color: var(--primary-color);
     border: none;
     outline: none;
     cursor: pointer;
@@ -53,20 +54,20 @@
 
 .caret {
     border: .25em solid transparent;
-    border-top-color: var(--primary-color, #777);
+    border-top-color: var(--primary-color);
     translate: 0 25%;
 }
 
 .clear-btn:focus-visible, .clear-btn:hover {
-    color: var(--cancel-color-strong, rgba(255, 0, 0, 0.6));
+    color: var(--cancel-color-strong);
 }
 
-:where(.close-icon:focus-visible, .close-icon:hover) > .caret {
-    border-top-color: var(--accent-color, lightskyblue);
+:where(.toggle-icon:focus-visible, .toggle-icon:hover) > .caret {
+    border-top-color: var(--accent-color);
 }
 
 .divider {
-    background-color: var(--primary-color, #777);
+    background-color: var(--primary-color);
     padding: 0;
     align-self: stretch;
     width: 0.05em;
@@ -87,7 +88,7 @@
     left: 0;
     right: 0;
     top: calc(100% + 0.25em);
-    background-color: var(--bg-color, white);
+    background-color: var(--bg-color);
     z-index: 1000;
 }
 
@@ -101,11 +102,11 @@
 }
 
 .option.selected {
-    background-color: rgba(135, 206, 250, 0.6);
+    background-color: var(--highlighted-color);
 }
 
 .option.highlighted {
-    background-color: rgba(30, 144, 255, 0.6);
+    background-color: var(--selected-color);
     color: white;
 }
 
@@ -126,10 +127,10 @@
 }
 
 .option-badge:hover, .option-badge:focus-visible {
-    background-color: var(--cancel-color-light, rgba(255, 0, 0, 0.1));
-    outline-color: var(--cancel-color-strong, rgba(255, 0, 0, 0.6));
+    background-color: var(--cancel-color-light);
+    outline-color: var(--cancel-color-strong);
 }
 
-.option-badge:hover > .clear-btn, .option-badge:focus-visible > .clear-btn {
-    color: var(--cancel-color-strong, rgba(255, 0, 0, 0.6));
+:where(.option-badge:hover,.option-badge:focus-visible) > .clear-btn {
+    color: var(--cancel-color-strong);
 }

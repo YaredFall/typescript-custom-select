@@ -24,12 +24,17 @@ type SelectProps = {
 
 const Select: FC<SelectProps> = ({ multiple, currentOption, onChange, options}) => {
 
+    //States
     const [isOpen, setIsOpen] = useState(false);
-    const [highlightedIndex, setHighlightedIndex] = useState(0);
+    const [highlightedIndex, setHighlightedIndex] = useState<number | undefined>(undefined);
 
+    //Refs
     const containerRef = useRef<HTMLDivElement>(null);
+    const highlightedLIRef = useRef<HTMLLIElement>(null);
+    const highlightedIdChangeByKB = useRef<number>(0);
 
-    const toggleOptions = (e: React.MouseEvent) => {
+    //Handlers
+    const toggleOptions = (e: React.MouseEvent | KeyboardEvent) => {
         e.stopPropagation();
         setIsOpen(prev => !prev);
     }
@@ -37,6 +42,7 @@ const Select: FC<SelectProps> = ({ multiple, currentOption, onChange, options}) 
     const clearOptions = (e: React.MouseEvent): void => {
         e.stopPropagation();
         multiple ? onChange([]) : onChange(undefined);
+        containerRef.current?.focus();
     }
 
     const selectOption = (option: SelectOption) => (e: React.MouseEvent | KeyboardEvent) => {
@@ -52,45 +58,57 @@ const Select: FC<SelectProps> = ({ multiple, currentOption, onChange, options}) 
             if (option !== currentOption) {
                 onChange(option);
             }
+            hideOptions();
         }
-        hideOptions();
     }
 
     const isSelected = (option: SelectOption) =>
-        multiple ? currentOption.includes(option)
-        : option == currentOption;
+        multiple ? currentOption.includes(option) : option == currentOption;
 
+    //Effects
     useEffect(() => {
         if (!isOpen)
-            setHighlightedIndex(0);
+            setHighlightedIndex(undefined);
+            highlightedIdChangeByKB.current = 0;
     }, [isOpen])
+
+    useEffect(() => {
+        if (highlightedIdChangeByKB.current !== 0) {
+            highlightedLIRef.current?.scrollIntoView({block: "nearest"});
+        }
+    }, [highlightedIndex]);
 
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
             if (e.target != containerRef.current) return;
+
             switch (e.code) {
                 case "Enter":
                 case "Space":
-                    setIsOpen(prev => !prev);
                     if (isOpen) {
-                        selectOption(options[highlightedIndex])(e);
+                        highlightedIndex !== undefined ?
+                            selectOption(options[highlightedIndex])(e) :
+                            hideOptions()
+                    } else {
+                        toggleOptions(e)
                     }
                     break
                 case "ArrowUp":
                 case "ArrowDown": {
                     if (!isOpen) {
-                        setIsOpen(true);
+                        toggleOptions(e);
                         break
                     }
 
-                    const newIndex = highlightedIndex + (e.code === "ArrowDown" ? 1 : -1)
+                    highlightedIdChangeByKB.current = (e.code === "ArrowDown" ? 1 : -1);
+                    const newIndex = highlightedIndex !== undefined ? (highlightedIndex + highlightedIdChangeByKB.current) : 0
                     if (newIndex >= 0 && newIndex < options.length) {
                         setHighlightedIndex(newIndex);
                     }
                     break
                 }
                 case "Escape":
-                    setIsOpen(false);
+                    hideOptions();
                     break
             }
         }
@@ -99,31 +117,42 @@ const Select: FC<SelectProps> = ({ multiple, currentOption, onChange, options}) 
         return () => {
             containerRef.current?.removeEventListener("keydown", handler);
         }
-    }, [isOpen, highlightedIndex, options]);
+    }, [isOpen, highlightedIndex, currentOption, options]);
 
-
+    //JSX
     return (
         <div ref={containerRef} className={styles.container} onClick={toggleOptions} onBlur={(e) => {
             if (!e.currentTarget.contains(e.relatedTarget)) {
                 hideOptions();
             }
         }} tabIndex={0}>
-            <span className={styles["chosen-label"]} children={multiple ? currentOption.map(o => (
-                <button key={`ch${o.value}`} className={styles["option-badge"]} onClick={selectOption(o)}>
+            <span className={styles["chosen-label"]}
+                  children={
+                multiple
+                    ? currentOption.map(o => (
+                <button key={`ch${o.value}`} className={styles["option-badge"]} onClick={(e) => {
+                    selectOption(o)(e);
+                    containerRef.current?.focus();
+                }}>
                     {o.label}<span className={styles["clear-btn"]} children="&times;" />
                 </button>
-            )) : currentOption?.label} />
+            ))
+                    : currentOption?.label} />
             <button className={styles["clear-btn"]} onClick={clearOptions} children="&times;" title={"Remove selected"} />
             <div className={styles.divider} />
-            <div className={styles["close-icon"]} onClick={(e) => {
+            <div className={styles["toggle-icon"]} onClick={(e) => {
                 toggleOptions(e);
                 containerRef.current?.focus();
-            }} children={<div className={`${styles.caret} ${isOpen ? "" : styles.highlighted}`}/>} />
+            }} children={<div className={styles.caret}/>} />
             <ul className={`${styles.options} ${isOpen ? styles.shown : ""}`} children={options.map(
                 (option, index) => (<li
                     key={`li${option.value}`}
-                    className={`${styles.option} ${isSelected(option) ? styles.selected : ""} ${index == highlightedIndex ? styles.highlighted : ""}`}
-                    onMouseEnter={() => setHighlightedIndex(index)}
+                    ref={index === highlightedIndex ? highlightedLIRef : undefined}
+                    className={`${styles.option} ${isSelected(option) ? styles.selected : ""} ${index === highlightedIndex ? styles.highlighted : ""}`}
+                    onMouseEnter={() => {
+                        highlightedIdChangeByKB.current = 0;
+                        setHighlightedIndex(index);
+                    }}
                     onClick={selectOption(option)}
                     children={option.label} />)
             )} />

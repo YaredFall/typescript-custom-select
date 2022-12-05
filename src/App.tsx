@@ -7,6 +7,7 @@ const options=[
     {label: "Third", value: 3},
     {label: "Fourth", value: 4},
     {label: "Fifth", value: 5},
+    {label: "Sixth", value: 6},
 ]
 
 function App() {
@@ -16,28 +17,34 @@ function App() {
 
     return (
     <div className="App">
-        <h1 children={"Custom <select> element"} />
-        <h4 children={"using React and TypeScript"} />
+        <main>
+            <h1 children={"Custom <select> element"} />
+            <h4 children={"using React and TypeScript"} />
 
-        <div className={"two-column wrapper"}>
-            <div className="centred wrapper">
-                <h3 children={"Single option"} />
-                <Select
-                    currentOption={currentSingleOption}
-                    options={options}
-                    onChange={option => setCurrentSingleOption(option)}
-                />
+            <div className={"two-column wrapper"}>
+                <div className="centred wrapper">
+                    <h3 children={"Single option"} />
+                    <Select
+                        currentOption={currentSingleOption}
+                        options={options}
+                        onChange={option => setCurrentSingleOption(option)}
+                    />
+                </div>
+                <div className="centred wrapper">
+                    <h3 children={"Multiple options"} />
+                    <Select
+                        multiple={true}
+                        currentOption={currentMultipleOption}
+                        options={options}
+                        onChange={option => setCurrentMultipleOption(option)}
+                    />
+                </div>
             </div>
-            <div className="centred wrapper">
-                <h3 children={"Multiple options"} />
-                <Select
-                    multiple={true}
-                    currentOption={currentMultipleOption}
-                    options={options}
-                    onChange={option => setCurrentMultipleOption(option)}
-                />
-            </div>
-        </div>
+        </main>
+        <footer className={"two-column wrapper"}>
+            <p>By <a href={"https://github.com/YaredFall"} title={"GitHub profile"}>YaredFall</a></p>
+            <p>Source code can be found <a href={"https://github.com/YaredFall/typescript-custom-select"} title={"Project repository on GitHub"}>here</a></p>
+        </footer>
     </div>
   )
 }

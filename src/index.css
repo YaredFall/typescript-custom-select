@@ -4,6 +4,12 @@
 
 :root {
   --bg-color: white;
+  --accent-color: lightskyblue;
+  --primary-color: #777;
+  --cancel-color-light: rgba(255, 0, 0, 0.1);
+  --cancel-color-strong: rgba(255, 0, 0, 0.6);
+  --highlighted-color: rgba(135, 206, 250, 0.6);
+  --selected-color: rgba(30, 144, 255, 0.6);
 
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 1rem;
@@ -51,26 +57,28 @@ h4 {
   color: var(--primary-color, #777);
 }
 
-.App {
+.App, main {
   padding: 1em;
   display: flex;
   flex-direction: column;
   place-items: center;
 }
 
-.wrapper {
-  min-width: fit-content;
-}
-
 .two-column {
   display: grid;
   justify-items: center;
-  grid-template-columns: 33% 33%;
-  grid-gap: 33%;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 2rem;
 }
 
 .centred {
   display: flex;
   flex-direction: column;
   place-items: center;
+}
+
+footer {
+  width: 100vw;
+  position: fixed;
+  bottom: 0;
 }
